@@ -133,7 +133,6 @@ class ListpagesUtil(object):
 
     def return_data_strip(self, data) -> dict:
         strip_data = {}
-        print(data)
         strip_data['title'] = data['title']
         strip_data['url'] = data['fullname']
 
@@ -145,11 +144,11 @@ class ListpagesUtil(object):
 
     def utc_to_jst(self, timestamp_utc):
         datetime_utc = datetime.datetime.strptime(
-            timestamp_utc + "+0000", "%d %m %Y %H:%M.%f%z")
-        datetime_jst = datetime_utc.astimezone(
-            datetime.timezone(datetime.timedelta(hours=+9)))
+            timestamp_utc, "%d %b %Y %H:%M")
+        datetime_jst = datetime_utc + datetime.timedelta(hours=+9)
         timestamp_jst = datetime.datetime.strftime(
-            datetime_jst, '%Y-%m-%d %H:%M:%S.%f')
+            datetime_jst, "%d %b %Y %H:%M")
+
         return timestamp_jst
 
 
@@ -248,18 +247,26 @@ if __name__ == "__main__":
 
     setting_dict = load_json(json_path)
 
-    temp_dict = setting_dict["criticism-in"]
-    url = temp_dict["target_url"]
-    username = temp_dict["username"]
-    avatar_url = temp_dict["avatar_url"]
-    webhook_url = temp_dict["webhook_url"]
-    root_url = temp_dict["root_url"]
+    url = setting_dict["criticism-in"]["target_url"]
+    username = setting_dict["criticism-in"]["username"]
+    avatar_url = setting_dict["criticism-in"]["avatar_url"]
+    webhook_url = setting_dict["criticism-in"]["webhook_url"]
+    root_url = setting_dict["criticism-in"]["root_url"]
+    last_url = setting_dict["criticism-in"]["last_url"]
 
     criticism_in_pages = lu.LIST_PAGES(
         url=url,
-        limit='1',
+        limit='50',
         tags='_criticism-in',
         category='draft')
+
+    # ここから
+    url_list = [i['fullname'] for i in criticism_in_pages]
+
+    index = 0
+    if last_url in url_list:
+        index = url_list.index(last_url) + 1
+    criticism_in_pages = criticism_in_pages[index:]
 
     for i in criticism_in_pages:  # レートリミット回避目的で順番に処理する
         # webhookを投げる処理を書く(名前とURLは引数にする)しwebhookはもっとリッチにする
@@ -270,18 +277,32 @@ if __name__ == "__main__":
             webhook_url=webhook_url,
             root_url=root_url)
 
+        last_url = send_dict['url']
+
         hook.send_webhook(send_dict)
 
-    temp_dict = setting_dict["most-recently-created"]
-    url = temp_dict["target_url"]
-    username = temp_dict["username"]
-    avatar_url = temp_dict["avatar_url"]
-    webhook_url = temp_dict["webhook_url"]
-    root_url = temp_dict["root_url"]
+    setting_dict["criticism-in"]['last_url'] = last_url
+    dump_json(json_path, setting_dict)
+    # ここまで関数にする
+
+    url = setting_dict["most-recently-created"]["target_url"]
+    username = setting_dict["most-recently-created"]["username"]
+    avatar_url = setting_dict["most-recently-created"]["avatar_url"]
+    webhook_url = setting_dict["most-recently-created"]["webhook_url"]
+    root_url = setting_dict["most-recently-created"]["root_url"]
+    last_url = setting_dict["most-recently-created"]["last_url"]
 
     most_recentry_created_pages = lu.LIST_PAGES(
         url=url,
-        limit='3',)
+        limit='50',
+        order='created_at desc')
+
+    url_list = [i['fullname'] for i in most_recentry_created_pages]
+
+    index = 0
+    if last_url in url_list:
+        index = url_list.index(last_url) + 1
+    most_recentry_created_pages = most_recentry_created_pages[index:]
 
     for i in most_recentry_created_pages:
         send_dict = lu.return_data_strip(i)
@@ -292,3 +313,8 @@ if __name__ == "__main__":
             root_url=root_url)
 
         hook.send_webhook(send_dict)
+
+        last_url = send_dict['url']
+
+    setting_dict["most-recently-created"]['last_url'] = last_url
+    dump_json(json_path, setting_dict)
