@@ -65,7 +65,7 @@ class ListpagesUtil(object):
         sem = asyncio.Semaphore(10)
 
         def perPage(p=1, mode="oj"):
-            print(f'requesting Page {p}')
+            # print(f'requesting Page {p}')
 
             obj.update({'p': p})
             param = [k + '=' + str(obj[k]) for k in obj]
@@ -81,7 +81,7 @@ class ListpagesUtil(object):
                 if res.status_code is requests.codes.ok:
                     break
 
-            print(f'Page {p} Done')
+            # print(f'Page {p} Done')
 
             if mode == "html":
                 return bs4.BeautifulSoup(res.json()['body'], 'html.parser')
