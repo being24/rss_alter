@@ -144,3 +144,6 @@ class ListpagesUtil(object):
             datetime_jst, "%d %b %Y %H:%M")
 
         return timestamp_jst
+
+if __name__ == "__main__":
+    pass
