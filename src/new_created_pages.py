@@ -61,7 +61,7 @@ if __name__ == "__main__":
         index = url_list.index(last_url) + 1
     criticism_in_pages = criticism_in_pages[index:]
 
-    for i in criticism_in_pages:
+    for i in reversed(criticism_in_pages):
         send_dict = lu.return_data_strip(i)
         hook.set_parameter(
             username=username,
@@ -95,7 +95,7 @@ if __name__ == "__main__":
         index = url_list.index(last_url) + 1
     most_recentry_created_pages = most_recentry_created_pages[index:]
 
-    for i in most_recentry_created_pages:
+    for i in reversed(most_recentry_created_pages) :
         send_dict = lu.return_data_strip(i)
         hook.set_parameter(
             username=username,
