@@ -31,6 +31,7 @@ class Webhook():
         created_by = content['created_by']
         created_at = content['created_at']
         updated_at = content['updated_at']
+        tags = content['tags']
 
         msg_ = {"username": self.USERNAME,
                 "avatar_url": self.AVATOR_URL,
@@ -44,6 +45,8 @@ class Webhook():
                                         "inline": True},
                                        {"name": "更新日時",
                                         "value": f"{updated_at}"},
+                                       {"name": "タグ",
+                                        "value": f"{tags}"},
                                        ],
                             }]}
         return msg_
