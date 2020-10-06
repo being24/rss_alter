@@ -52,11 +52,11 @@ if __name__ == "__main__":
         limit='50',
         tags='_criticism-in',
         category='draft',
-        )
+    )
 
     url_list = [i['fullname'] for i in criticism_in_pages]
 
-    index = 0
+    index = 100
     if last_url in url_list:
         index = url_list.index(last_url)
     criticism_in_pages = criticism_in_pages[:index]
@@ -90,7 +90,7 @@ if __name__ == "__main__":
 
     url_list = [i['fullname'] for i in most_recentry_created_pages]
 
-    index = 0
+    index = 100
     if last_url in url_list:
         index = url_list.index(last_url)
     most_recentry_created_pages = most_recentry_created_pages[:index]
