@@ -51,6 +51,7 @@ class ListpagesUtil(object):
                 'rating_votes',
                 'revisions',
                 'tags',
+                '_tags',
             ]))
 
         obj = {
@@ -130,6 +131,8 @@ class ListpagesUtil(object):
         strip_data['title'] = data['title']
         strip_data['url'] = data['fullname']
 
+        strip_data['tags'] = data['tags'] + data['_tags']
+
         strip_data['created_by'] = data['created_by']
         strip_data['created_at'] = self.utc_to_jst(data['created_at'])
         strip_data['updated_at'] = self.utc_to_jst(data['updated_at'])
@@ -144,6 +147,7 @@ class ListpagesUtil(object):
             datetime_jst, "%d %b %Y %H:%M")
 
         return timestamp_jst
+
 
 if __name__ == "__main__":
     pass
