@@ -7,6 +7,7 @@ import pathlib
 
 from utils.listpages import ListpagesUtil
 from utils.webhook import Webhook
+from utils.RSS_parse import RSSPerse
 
 
 def load_json(json_path) -> dict:
@@ -32,14 +33,17 @@ if __name__ == "__main__":
     data_path = pathlib.Path(__file__).parent
     data_path /= '../data'
     data_path = data_path.resolve()
-    json_path = data_path
-    json_path /= './config.json'
+    config_path = data_path
+    config_path /= './config.json'
 
     lu = ListpagesUtil()
     hook = Webhook()
 
-    setting_dict = load_json(json_path)
+    rss = RSSPerse()
 
+    setting_dict = load_json(config_path)
+
+    '''
     url = setting_dict["criticism-in"]["target_url"]
     username = setting_dict["criticism-in"]["username"]
     avatar_url = setting_dict["criticism-in"]["avatar_url"]
@@ -71,10 +75,10 @@ if __name__ == "__main__":
 
         last_url = send_dict['url']
 
-        hook.send_webhook(send_dict)
+        hook.send_webhook_article(send_dict, 'article')
 
     setting_dict["criticism-in"]['last_url'] = last_url
-    dump_json(json_path, setting_dict)
+    dump_json(config_path, setting_dict)
 
     url = setting_dict["most-recently-created"]["target_url"]
     username = setting_dict["most-recently-created"]["username"]
@@ -103,9 +107,30 @@ if __name__ == "__main__":
             webhook_url=webhook_url,
             root_url=root_url)
 
-        hook.send_webhook(send_dict)
+        hook.send_webhook_article(send_dict, 'article')
 
         last_url = send_dict['url']
 
     setting_dict["most-recently-created"]['last_url'] = last_url
-    dump_json(json_path, setting_dict)
+    dump_json(config_path, setting_dict)
+    '''
+
+    rss_dict = rss.ReturnRSSList()
+
+    for key, val in rss_dict.items():
+        rss_data = rss.getnewpostspercategory(val['url'], val['categoryid'])
+
+        last_url = val['last_url']
+
+        url_list = [i['threadid'] for i in rss_data]
+
+        index = 100
+        if last_url in url_list:
+            index = url_list.index(last_url)
+        rss_data = rss_data[:index]
+
+        # ここまでできた
+
+        print(rss_data)
+
+        hook.gen_webhook_msg_RSS(rss_data)
