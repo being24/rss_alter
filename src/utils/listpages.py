@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import json
 import pathlib
+import pprint
 
 import bs4
 import requests
@@ -58,7 +59,18 @@ class ListpagesUtil(object):
             'perPage': '250',
             'moduleName': 'list/ListPagesModule'
         }
-        obj.update(kwargs)
+
+        str_params = {}
+        dict_params = {}
+
+        for key, val in kwargs.items():
+            if isinstance(val, str):
+                str_params[key] = val
+            elif isinstance(val, dict):
+                dict_params = val
+
+        obj.update(str_params)
+        obj.update(dict_params)
 
         listpages = []
         results = []
@@ -150,4 +162,16 @@ class ListpagesUtil(object):
 
 
 if __name__ == "__main__":
-    pass
+    url = "http://scp-jp-sandbox3.wikidot.com/ajax-module-connector.php"
+
+    '''
+    hoge = ListpagesUtil().LIST_PAGES(url=url, limit="5")
+    pprint.pprint(hoge)
+    '''
+
+    test = {"limit": '5', "category": 'draft', "tags": '_criticism-in'}
+    test = {"limit": '5'}
+    # dictのパラメータを受け取り、展開できるようにLISTPAGESを変更する
+
+    fuga = ListpagesUtil().LIST_PAGES(url=url, limit="5")
+    pprint.pprint(fuga)
