@@ -1,49 +1,50 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import json
-from json import load
+import datetime
 import pathlib
 import pprint
 import re
-from datetime import datetime
 
 import feedparser
 
-
-def load_json(json_path: pathlib.Path) -> dict:
-    if not json_path.exists():
-        raise FileNotFoundError
-
-    with open(json_path, encoding='utf-8') as f:
-        json_dict = json.load(f)
-    return json_dict
-
-
-def dump_json(json_path, data) -> None:
-    with open(json_path, 'w', encoding='utf-8') as f:
-        json.dump(
-            data,
-            f,
-            indent=2,
-            ensure_ascii=False)
+from common import BaseUtilities  # ここ、何とかしたいんだけどどうすりゃいいんだ、実行場所によってエラーが出たりでなかったりする
 
 
 class RSSPerse():
     def __init__(self) -> None:
-        data_path = pathlib.Path(__file__).parents[1]
+        com = BaseUtilities()
+
+        data_path = pathlib.Path(__file__).parent
         data_path /= '../data'
         data_path = data_path.resolve()
         RSS_list_path = data_path
-        RSS_list_path /= './RSS_list.json'
+        RSS_list_path /= './NewThreads.json'
 
         if not RSS_list_path.exists():
             raise FileNotFoundError
         else:
-            self.RSS_dict = load_json(RSS_list_path)
+            self.RSS_dict = com.load_json(RSS_list_path)
 
     def ReturnRSSList(self):
         return self.RSS_dict
+
+    def return_data_strip(self, data) -> dict:  # ここを修正
+        strip_data = {}
+        strip_data['title'] = data['title']
+        strip_data['url'] = data['threadid']
+
+        strip_data['created_at'] = self.utc_to_jst(data['postdate'])
+        strip_data['author'] = data['author']
+
+        return strip_data
+
+    def utc_to_jst(self, timestamp_utc):
+        # datetime_jst = timestamp_utc + datetime.timedelta(hours=+9)
+        timestamp_jst = datetime.datetime.strftime(
+            timestamp_utc, "%d %b %Y %H:%M")
+
+        return timestamp_jst
 
     def getnewpostspercategory(self, url, categoryid):
         try:
@@ -63,7 +64,7 @@ class RSSPerse():
                         author = re.sub("[_ ]", "-", author)
                     except Exception:
                         author = "unknown"
-                    postdate = datetime.strptime(
+                    postdate = datetime.datetime.strptime(
                         thread.published, "%a, %d %b %Y %H:%M:%S %z")
                     postdate = postdate.astimezone()
                     result.append({
@@ -83,8 +84,9 @@ class RSSPerse():
 
 if __name__ == "__main__":
     rss = RSSPerse()
-
     rss.ReturnRSSList()
+    url = 'scp-jp.wikidot.com/'
+    categoryid = '790925'
 
-    # result = rss.getnewpostspercategory(url, categoryid)
-    # pprint.pprint(result)
+    result = rss.getnewpostspercategory(url, categoryid)
+    pprint.pprint(result)

@@ -67,10 +67,10 @@ class ListpagesUtil(object):
             if isinstance(val, str):
                 str_params[key] = val
             elif isinstance(val, dict):
-                dict_params = val
+                dict_params.update(val)
 
-        obj.update(str_params)
         obj.update(dict_params)
+        obj.update(str_params)
 
         listpages = []
         results = []
@@ -170,8 +170,8 @@ if __name__ == "__main__":
     '''
 
     test = {"limit": '5', "category": 'draft', "tags": '_criticism-in'}
-    test = {"limit": '5'}
+    # test = {"limit": '5'}
     # dictのパラメータを受け取り、展開できるようにLISTPAGESを変更する
 
-    fuga = ListpagesUtil().LIST_PAGES(url=url, limit="5")
+    fuga = ListpagesUtil().LIST_PAGES(url=url, limit="5", params_dict=test)
     pprint.pprint(fuga)
