@@ -2,14 +2,7 @@
 # coding: utf-8
 
 
-import json
-import os
 import pathlib
-import pprint
-import sys
-
-from soupsieve import select
-
 
 from src.common import BaseUtilities
 from src.listpages import ListpagesUtil
@@ -64,7 +57,7 @@ class NewPagesAndCriticismIn():
 
                 last_url = send_dict['url']
 
-                # hook.send_webhook_article(send_dict, 'article')
+                self.hook.send_webhook(send_dict, 'LISTPAGES')
 
             vals['last_url'] = last_url
             self.com.dump_json(self.config_path, self.listpages_dict)
@@ -127,28 +120,6 @@ class NewThreads():
             self.com.dump_json(self.config_path, self.RSS_dict)
 
 
-def arc():
-    rss_dict = rss.ReturnRSSList()
-
-    for key, val in rss_dict.items():
-        rss_data = rss.getnewpostspercategory(val['url'], val['categoryid'])
-
-        last_url = val['last_url']
-
-        url_list = [i['threadid'] for i in rss_data]
-
-        index = 100
-        if last_url in url_list:
-            index = url_list.index(last_url)
-        rss_data = rss_data[:index]
-
-        # ここまでできた
-
-        print(rss_data)
-
-        hook.gen_webhook_msg_RSS(rss_data)
-
-
 if __name__ == "__main__":
-    # NewPagesAndCriticismIn().get_listpages_and_send_webhook()
+    NewPagesAndCriticismIn().get_listpages_and_send_webhook()
     NewThreads().get_rss_and_send_webhook()
