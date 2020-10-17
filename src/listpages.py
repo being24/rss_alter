@@ -138,13 +138,11 @@ class ListpagesUtil(object):
             listpages += i
         return listpages
 
-    def return_data_strip(self, data) -> dict:
+    def return_data_strip(self, data) -> namedtuple:
         strip_data = {}
-        strip_data['title'] = data['title']
         strip_data['url'] = data['fullname']
-
+        strip_data['title'] = data['title']
         strip_data['tags'] = data['tags'] + data['_tags']
-
         strip_data['created_by'] = data['created_by']
         strip_data['created_at'] = self.utc_to_jst(data['created_at'])
         strip_data['updated_at'] = self.utc_to_jst(data['updated_at'])
