@@ -129,5 +129,7 @@ dmypy.json
 .pyre/
 .vscode
 
+# User add
 *.json
 !pyrightconfig.json
+*.sqlite3
