@@ -8,6 +8,7 @@ from src.common import BaseUtilities
 from src.listpages import ListpagesUtil
 from src.RSS_parse import RSSPerse
 from src.webhook import Webhook
+from src.sqlite_util import Sqlite
 
 
 class NewPagesAndCriticismIn():
@@ -15,6 +16,7 @@ class NewPagesAndCriticismIn():
         self.com = BaseUtilities()
         self.hook = Webhook()
         self.lu = ListpagesUtil()
+        self.db = Sqlite()
 
         data_path = pathlib.Path(__file__)
         data_path /= '../data'
@@ -27,8 +29,13 @@ class NewPagesAndCriticismIn():
         else:
             self.listpages_dict = self.com.load_json(self.config_path)
 
+    def merge_sql(self, table_name) -> str:
+        sql_statement = f'INSERT INTO {table_name}( url, title, tags, created_by, created_at, updated_at ) VALUES( ?, ?, ?, ?, ?, ? ) ON  conflict( url ) DO UPDATE SET tags = excluded.tags, updated_at = excluded.updated_at'
+        return sql_statement
+
     def get_listpages_and_send_webhook(self):
-        for vals in self.listpages_dict.values():
+        for key, vals in self.listpages_dict.items():
+
             url = vals["target_url"]
             username = vals["username"]
             avatar_url = vals["avatar_url"]
@@ -40,7 +47,24 @@ class NewPagesAndCriticismIn():
             result = self.lu.LIST_PAGES(
                 url=url, limit="50", param_dict=param_dict)
 
-            url_list = [i['fullname'] for i in result]
+            result = [self.lu.return_data_strip(i) for i in result]
+
+            merge_sql = self.merge_sql(key)
+            self.db.create_db(key)
+            data = [list(i) for i in result]
+
+            for page in result:
+                isexist_sql = f''
+                print(page.url)
+
+            # とりあえず、全件入れてみる
+            self.db.executemany(merge_sql, data)
+
+            # fullnameを取得、比較して存在しなければ書き込み+通知用リスト入り、存在していたらupdateする
+            # それとは別に、age検知を組み込んでageを揚げる
+            # ここを書き換える
+
+            url_list = [i.url for i in result]
 
             index = 100
             if last_url in url_list:
@@ -48,16 +72,15 @@ class NewPagesAndCriticismIn():
             result = result[:index]
 
             for i in reversed(result):
-                send_dict = self.lu.return_data_strip(i)
                 self.hook.set_parameter(
                     username=username,
                     avatar_url=avatar_url,
                     webhook_url=webhook_url,
                     root_url=root_url)
 
-                last_url = send_dict['url']
+                last_url = i['url']
 
-                self.hook.send_webhook(send_dict, 'LISTPAGES')
+                # self.hook.send_webhook(i, 'LISTPAGES')
 
             vals['last_url'] = last_url
             self.com.dump_json(self.config_path, self.listpages_dict)
@@ -122,4 +145,4 @@ class NewThreads():
 
 if __name__ == "__main__":
     NewPagesAndCriticismIn().get_listpages_and_send_webhook()
-    NewThreads().get_rss_and_send_webhook()
+    # NewThreads().get_rss_and_send_webhook()
