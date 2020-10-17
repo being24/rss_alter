@@ -3,7 +3,7 @@
 
 import pathlib
 import sqlite3
-from collections import namedtuple
+from typing import NamedTuple
 
 
 class Sqlite():
@@ -22,7 +22,7 @@ class Sqlite():
     def create_db(self, table_name):
         db = sqlite3.connect(self.db_path)
         db.execute(
-            f'create table if not exists {table_name}'
+            f'create table if not exists "{table_name}"'
             '(url TEXT PRIMARY KEY, title TEXT, tags TEXT,'
             'created_by TEXT, created_at TEXT, updated_at TEXT)')
 
@@ -55,16 +55,23 @@ class Sqlite():
         cur.execute(sql)
 
         fieldname_list = [field[0] for field in cur.description]
-        RowNamedtuple = namedtuple("RowNamedtuple", fieldname_list)
+        RowNamedtuple = NamedTuple("RowNamedtuple", fieldname_list)
         rows = [RowNamedtuple._make(row) for row in cur]
         return rows
+
+    def is_exist(self, sql: str) -> bool:
+        cur = self.con.cursor()
+        cur.execute(sql)
+        result = cur.fetchall()[0][0]
+
+        return(result)
 
 
 if __name__ == "__main__":
     db = Sqlite()
     table_name = 'recently_created'
     db.create_db(table_name)
-    insert_sql = f'INSERT INTO {table_name}( url, title, tags, created_by, created_at, updated_at ) VALUES( ?, ?, ?, ?, ?, ? ) ON  conflict( url ) DO UPDATE SET tags = excluded.tags, updated_at = excluded.updated_at'
+    insert_sql = f'INSERT INTO "{table_name}"( url, title, tags, created_by, created_at, updated_at ) VALUES( ?, ?, ?, ?, ?, ? ) ON  conflict( url ) DO UPDATE SET tags = excluded.tags, updated_at = excluded.updated_at'
     data = (
         'url',
         'author',
@@ -75,8 +82,10 @@ if __name__ == "__main__":
 
     db.execute(insert_sql, data)
 
-    get_sql = f'SELECT * FROM {table_name} ;'
+    url = 'operation-tungsten-gargantua-05'
 
-    result = db.get(get_sql)
+    get_sql = f'SELECT COUNT(*) FROM "{table_name}" WHERE url="{url}"'
 
-    print(result[0].url)
+    result = db.is_exist(get_sql)
+
+    print(result)
