@@ -3,9 +3,19 @@ import datetime
 import json
 import pathlib
 import pprint
+from typing import NamedTuple
 
 import bs4
 import requests
+
+
+class DataTuple(NamedTuple):
+    url: str
+    title: str
+    tags: str
+    created_by: str
+    created_at: str
+    updated_at: str
 
 
 class ListpagesUtil(object):
@@ -138,18 +148,21 @@ class ListpagesUtil(object):
             listpages += i
         return listpages
 
-    def return_data_strip(self, data) -> namedtuple:
-        strip_data = {}
-        strip_data['url'] = data['fullname']
-        strip_data['title'] = data['title']
-        strip_data['tags'] = data['tags'] + data['_tags']
-        strip_data['created_by'] = data['created_by']
-        strip_data['created_at'] = self.utc_to_jst(data['created_at'])
-        strip_data['updated_at'] = self.utc_to_jst(data['updated_at'])
+    def return_data_strip(self, data) -> NamedTuple:
+        tags = data['tags'] + data['_tags']
+        created_at = self._utc_to_jst(data['created_at'])
+        updated_at = self._utc_to_jst(data['updated_at'])
+        strip_data = DataTuple(
+            url=data['fullname'],
+            title=data['title'],
+            tags=tags,
+            created_by=data['created_by'],
+            created_at=created_at,
+            updated_at=updated_at)
 
         return strip_data
 
-    def utc_to_jst(self, timestamp_utc):
+    def _utc_to_jst(self, timestamp_utc):
         datetime_utc = datetime.datetime.strptime(
             timestamp_utc, "%d %b %Y %H:%M")
         datetime_jst = datetime_utc + datetime.timedelta(hours=+9)
