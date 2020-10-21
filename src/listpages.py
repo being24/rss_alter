@@ -92,7 +92,7 @@ class ListpagesUtil(object):
 
             obj.update({'p': p})
             param = [k + '=' + str(obj[k]) for k in obj]
-            param.append('wikidot_token7=123456')
+            param.append('wikidot_token7=123456')  # これいる？？？？
             while True:
                 res = requests.post(
                     url,
@@ -101,6 +101,7 @@ class ListpagesUtil(object):
                         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"},
                     cookies={
                         'wikidot_token7': '123456'})
+
                 if res.status_code is requests.codes.ok:
                     break
 

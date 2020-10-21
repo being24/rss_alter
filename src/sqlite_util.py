@@ -6,7 +6,7 @@ import sqlite3
 from typing import NamedTuple
 
 
-class Sqlite():
+class SQlite():
     def __init__(self):
         data_path = pathlib.Path(__file__).parent
         data_path /= '../data'
@@ -16,8 +16,8 @@ class Sqlite():
 
         if not self.db_path.exists():
             self.create_db('init')
-        else:
-            self.con = self._connect()
+
+        self.con = self._connect()
 
     def create_db(self, table_name):
         db = sqlite3.connect(self.db_path)
@@ -54,7 +54,7 @@ class Sqlite():
 
         cur.execute(sql)
 
-        fieldname_list = [field[0] for field in cur.description]
+        fieldname_list = [(field[0], type(field[0])) for field in cur.description]
         RowNamedtuple = NamedTuple("RowNamedtuple", fieldname_list)
         rows = [RowNamedtuple._make(row) for row in cur]
         return rows
@@ -68,9 +68,10 @@ class Sqlite():
 
 
 if __name__ == "__main__":
-    db = Sqlite()
-    table_name = 'recently_created'
+    db = SQlite()
+    table_name = 'criticism_in'
     db.create_db(table_name)
+    '''
     insert_sql = f'INSERT INTO "{table_name}"( url, title, tags, created_by, created_at, updated_at ) VALUES( ?, ?, ?, ?, ?, ? ) ON  conflict( url ) DO UPDATE SET tags = excluded.tags, updated_at = excluded.updated_at'
     data = (
         'url',
@@ -81,11 +82,19 @@ if __name__ == "__main__":
         'updated_at2')
 
     db.execute(insert_sql, data)
-
+    '''
+    '''
     url = 'operation-tungsten-gargantua-05'
 
     get_sql = f'SELECT COUNT(*) FROM "{table_name}" WHERE url="{url}"'
 
     result = db.is_exist(get_sql)
-
     print(result)
+    '''
+
+    created_by = 'thor_taisho'
+    same_author_sql = f'SELECT * FROM "{table_name}" WHERE created_by="{created_by}"'
+
+    result = db.get(same_author_sql)
+    for i in result:
+        print(i.title)
