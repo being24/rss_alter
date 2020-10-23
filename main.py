@@ -43,10 +43,6 @@ class NewPagesAndCriticismIn():
             param_dict = vals["params"]
             root_url = vals["root_url"]
 
-            self.hook.set_parameter(
-                webhook_url=webhook_url,
-                root_url=root_url)
-
             merge_sql = self.merge_sql(key)
 
             result = self.lu.LIST_PAGES(
@@ -76,6 +72,10 @@ class NewPagesAndCriticismIn():
                             self.hook.send_age(i, not_notified)
 
                     self.db.execute(merge_sql, not_notified)
+
+            self.hook.set_parameter(
+                webhook_url=webhook_url,
+                root_url=root_url)
 
             for i in reversed(not_notified_list):
                 self.hook.send_webhook(i, 'LISTPAGES')
