@@ -20,8 +20,7 @@ class Webhook():
         self.WEBHOOK_URL = 'hoo'
         self.ROOT_URL = 'bar'
 
-    def set_parameter(self, username, webhook_url, root_url):
-        self.USERNAME = username
+    def set_parameter(self, webhook_url, root_url):
         self.WEBHOOK_URL = webhook_url
         self.ROOT_URL = root_url
 
