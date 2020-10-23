@@ -1,0 +1,23 @@
+{
+  "notification": {
+    "username": "新規お知らせスレッド",
+    "url": "scp-jp.wikidot.com/",
+    "categoryid": "790923",
+    "last_url": "http://scp-jp.wikidot.com/forum/t-13679279"
+  },
+  "suggestion": {
+    "username": "新規提案スレッド",
+    "url": "scp-jp.wikidot.com/",
+    "categoryid": "790925",
+    "last_url": "http://scp-jp.wikidot.com/forum/t-13813920"
+  },
+  "policy": {
+    "username": "新規政策スレッド",
+    "url": "scp-jp.wikidot.com/",
+    "categoryid": "790926",
+    "last_url": "http://scp-jp.wikidot.com/forum/t-13825411"
+  },
+  "setting": {
+    "webhook_url": "webhook url here"
+  }
+}
