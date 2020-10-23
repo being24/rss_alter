@@ -140,4 +140,3 @@ class NewThreads():
 if __name__ == "__main__":
     NewPagesAndCriticismIn().get_listpages_and_send_webhook()
     NewThreads().get_rss_and_send_webhook()
-    # メモ jsonの整理（last_urlはいらない、webhookurlを合わせる、avatorurlを分ける）、DBは今日に分を送り込む
