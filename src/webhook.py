@@ -32,8 +32,7 @@ class Webhook():
         updated_at = content.updated_at
         tags = content.tags
 
-        msg_ = {"username": self.USERNAME,
-                "embeds": [{"title": f"{title}",
+        msg_ = {"embeds": [{"title": f"{title}",
                             "url": f"{self.ROOT_URL}{url}",
                             "fields": [{"name": "作成者",
                                         "value": f"{created_by}",
@@ -57,8 +56,7 @@ class Webhook():
         databased_title = databased.title
         databased_url = databased.url
 
-        msg_ = {"username": self.USERNAME,
-                "embeds": [{"title": "タイトルの類似度が高い下書きを検出しました",
+        msg_ = {"embeds": [{"title": "タイトルの類似度が高い下書きを検出しました",
                             "color": 16711680,
                             "fields": [{"name": "作成者",
                                         "value": f"{notified_created_by}",
@@ -79,8 +77,7 @@ class Webhook():
         created_by = content['author']
         created_at = content['created_at']
 
-        msg_ = {"username": self.USERNAME,
-                "embeds": [{"title": f"{title}",
+        msg_ = {"embeds": [{"title": f"{title}",
                             "url": f"{url}",
                             "fields": [{"name": "作成者",
                                         "value": f"{created_by}",
@@ -93,9 +90,7 @@ class Webhook():
         return msg_
 
     def gen_msg(self, content):
-        msg = {
-            "username": self.USERNAME,
-            "content": content}
+        msg = {"content": content}
         return msg
 
     def return_msg(self, msg, msg_type):
