@@ -132,7 +132,9 @@ class NewThreads():
 
                 last_url = send_dict['url']
 
-                self.hook.send_webhook(send_dict, 'RSS')
+                # self.hook.send_webhook(send_dict, 'RSS')
+
+            self.RSS_dict[key]['last_url'] = last_url
 
             self.com.dump_json(self.config_path, self.RSS_dict)
 
