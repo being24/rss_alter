@@ -38,20 +38,19 @@ class NewPagesAndCriticismIn():
     def get_listpages_and_send_webhook(self):
         for key, vals in self.listpages_dict.items():
 
-            url = vals["target_url"]
-            username = vals["username"]
+            target_url = vals["target_url"]
             webhook_url = vals["webhook_url"]
-            param_dict = vals["params"]  # dict
+            param_dict = vals["params"]
+            root_url = vals["root_url"]
 
             self.hook.set_parameter(
-                username=username,
                 webhook_url=webhook_url,
-                root_url=url)
+                root_url=root_url)
 
             merge_sql = self.merge_sql(key)
 
             result = self.lu.LIST_PAGES(
-                url=url, limit="250", param_dict=param_dict)
+                url=target_url, limit="250", param_dict=param_dict)
 
             result = [self.lu.return_data_strip(i) for i in result]
 
@@ -64,6 +63,10 @@ class NewPagesAndCriticismIn():
                     not_notified_list.append(page)
 
             if key == 'criticism_in':
+                webhook_url = vals["age_url"]
+                self.hook.set_parameter(
+                    webhook_url=webhook_url,
+                    root_url=root_url)
                 for not_notified in not_notified_list:
                     same_author_sql = f'SELECT * FROM "{key}" WHERE created_by="{not_notified.created_by}"'
                     selected_data = self.db.get(same_author_sql)
@@ -106,14 +109,11 @@ class NewThreads():
             if key == "setting":
                 continue
 
-            username = vals["username"]
             url = vals["url"]
             last_url = vals["last_url"]
             categoryid = vals["categoryid"]
-            last_url = vals["last_url"]
 
             self.hook.set_parameter(
-                username=username,
                 webhook_url=webhook_url,
                 root_url=url)
 
@@ -134,10 +134,10 @@ class NewThreads():
 
                 self.hook.send_webhook(send_dict, 'RSS')
 
-            vals['last_url'] = last_url
             self.com.dump_json(self.config_path, self.RSS_dict)
 
 
 if __name__ == "__main__":
     NewPagesAndCriticismIn().get_listpages_and_send_webhook()
     NewThreads().get_rss_and_send_webhook()
+    # メモ jsonの整理（last_urlはいらない、webhookurlを合わせる、avatorurlを分ける）、DBは今日に分を送り込む
