@@ -73,6 +73,8 @@ class NewPagesAndCriticismIn():
 
                     self.db.execute(merge_sql, not_notified)
 
+            webhook_url = vals["webhook_url"]
+
             self.hook.set_parameter(
                 webhook_url=webhook_url,
                 root_url=root_url)
@@ -132,7 +134,7 @@ class NewThreads():
 
                 last_url = send_dict['url']
 
-                # self.hook.send_webhook(send_dict, 'RSS')
+                self.hook.send_webhook(send_dict, 'RSS')
 
             self.RSS_dict[key]['last_url'] = last_url
 
