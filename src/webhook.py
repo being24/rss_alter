@@ -32,6 +32,15 @@ class Webhook():
         updated_at = content.updated_at
         tags = content.tags
 
+        tags = tags or None
+        updated_at = updated_at or None
+
+        if tags is None or "":
+            tags = "None"
+
+        if updated_at is None or "":
+            updated_at = "None"
+
         msg_ = {"embeds": [{"title": f"{title}",
                             "url": f"{self.ROOT_URL}{url}",
                             "fields": [{"name": "作成者",
