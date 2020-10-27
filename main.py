@@ -32,7 +32,8 @@ class NewPagesAndCriticismIn():
             self.listpages_dict = self.com.load_json(self.config_path)
 
     def merge_sql(self, table_name) -> str:
-        sql_statement = f'INSERT INTO {table_name}( url, title, tags, created_by, created_at, updated_at ) VALUES( ?, ?, ?, ?, ?, ? ) ON  conflict( url ) DO UPDATE SET tags = excluded.tags, updated_at = excluded.updated_at'
+        sql_statement = f"""INSERT INTO {table_name}( url, title, tags, created_by, created_at, updated_at ) VALUES( ?, ?, ?, ?, ?, ? )
+                            ON  conflict( url ) DO UPDATE SET title = excluded.title, tags = excluded.tags, created_by = excluded.created_by, created_at = excluded.created_at, updated_at = excluded.updated_at"""
         return sql_statement
 
     def get_listpages_and_send_webhook(self):
