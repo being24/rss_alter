@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import dataclasses
 import datetime
 import pathlib
 import pprint
@@ -9,6 +10,14 @@ import re
 import feedparser
 
 from common import BaseUtilities  # ここ、何とかしたいんだけどどうすりゃいいんだ、実行場所によってエラーが出たりでなかったりする
+
+
+@dataclasses.dataclass
+class RSSData():
+    url: str
+    title: str
+    author: str
+    created_at: str
 
 
 class RSSPerse():
@@ -66,13 +75,13 @@ class RSSPerse():
                         author = "unknown"
                     postdate = datetime.datetime.strptime(
                         thread.published, "%a, %d %b %Y %H:%M:%S %z")
-                    postdate = postdate.astimezone()
-                    result.append({
-                        "threadid": threadid,
-                        "title": title,
-                        "author": author,
-                        "postdate": postdate
-                    })
+                    postdate = postdate.astimezone().strftime('%Y-%m-%d %H:%M:%S')
+                    result.append(RSSData(
+                        url=threadid,
+                        title=title,
+                        author=author,
+                        created_at=postdate
+                    ))
                 except Exception as e:
                     print(e)
                     raise

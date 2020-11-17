@@ -31,6 +31,15 @@ class SQlite():
         con.row_factory = sqlite3.Row
         return con
 
+    def create_table(self, sql):
+        conn = sqlite3.connect(self.db_path)
+        cur = conn.cursor()
+
+        cur.execute(sql)
+
+        conn.commit()
+        conn.close()
+
     def execute(self, sql: str, data: tuple):
         cur = self.con.cursor()
         try:

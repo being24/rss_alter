@@ -2,6 +2,7 @@
 # coding: utf-8
 
 
+import dataclasses
 import pathlib
 
 from src.age_flyer import AgeFlyer
@@ -93,6 +94,7 @@ class NewThreads():
         self.com = BaseUtilities()
         self.hook = Webhook()
         self.rss = RSSPerse()
+        self.db = SQlite()
 
         data_path = pathlib.Path(__file__)
         data_path /= '../data'
@@ -105,6 +107,19 @@ class NewThreads():
         else:
             self.RSS_dict = self.com.load_json(self.config_path)
 
+        for key in self.RSS_dict.keys():
+            sql = f"""
+                    create table if not exists "{key}"
+                    (url TEXT PRIMARY KEY, title TEXT, author TEXT, datetime TEXT)
+                """
+
+            self.db.create_table(sql)
+
+    def merge_sql(self, table_name) -> str:
+        sql_statement = f"""INSERT INTO {table_name}(url , title , author , datetime ) VALUES( ?, ?, ?, ?)
+                            ON  conflict( url ) DO NOTHING"""
+        return sql_statement
+
     def get_rss_and_send_webhook(self) -> None:
         webhook_url = self.RSS_dict["setting"]["webhook_url"]
 
@@ -113,7 +128,6 @@ class NewThreads():
                 continue
 
             url = vals["url"]
-            last_url = vals["last_url"]
             categoryid = vals["categoryid"]
 
             self.hook.set_parameter(
@@ -123,23 +137,15 @@ class NewThreads():
             result = self.rss.getnewpostspercategory(
                 url=url, categoryid=categoryid)
 
-            url_list = [i['threadid'] for i in result]
+            for page in result:
+                exists_sql = f'SELECT COUNT(*) FROM "{key}" WHERE url="{page.url}" AND datetime="{page.created_at}"'
 
-            index = 100
-            if last_url in url_list:
-                index = url_list.index(last_url)
-            result = result[:index]
-
-            for i in reversed(result):
-                send_dict = self.rss.return_data_strip(i)
-
-                last_url = send_dict['url']
-
-                self.hook.send_webhook(send_dict, 'RSS')
-
-            self.RSS_dict[key]['last_url'] = last_url
-
-            self.com.dump_json(self.config_path, self.RSS_dict)
+                if not self.db.is_exist(exists_sql):
+                    send_dict = dataclasses.asdict(page)
+                    self.hook.send_webhook(send_dict, 'RSS')
+                    merge_sql = self.merge_sql(key)
+                    data = dataclasses.astuple(page)
+                    self.db.execute(merge_sql, data)
 
 
 if __name__ == "__main__":
