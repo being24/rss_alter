@@ -132,3 +132,4 @@ dmypy.json
 # User add
 *.json
 !pyrightconfig.json
+*.sqlite3

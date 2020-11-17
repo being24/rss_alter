@@ -72,6 +72,7 @@ class NewPagesAndCriticismIn():
                         match_ratio = self.age.fly(i.title, not_notified.title)
                         if match_ratio > 0.4:
                             self.hook.send_age(i, not_notified)
+                            pass
 
                     self.db.execute(merge_sql, not_notified)
 
@@ -137,7 +138,7 @@ class NewThreads():
             result = self.rss.getnewpostspercategory(
                 url=url, categoryid=categoryid)
 
-            for page in result:
+            for page in reversed(result):
                 exists_sql = f'SELECT COUNT(*) FROM "{key}" WHERE url="{page.url}" AND datetime="{page.created_at}"'
 
                 if not self.db.is_exist(exists_sql):

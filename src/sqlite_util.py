@@ -63,7 +63,8 @@ class SQlite():
 
         cur.execute(sql)
 
-        fieldname_list = [(field[0], type(field[0])) for field in cur.description]
+        fieldname_list = [(field[0], type(field[0]))
+                          for field in cur.description]
         RowNamedtuple = NamedTuple("RowNamedtuple", fieldname_list)
         rows = [RowNamedtuple._make(row) for row in cur]
         return rows
