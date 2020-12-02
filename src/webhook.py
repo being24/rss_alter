@@ -20,9 +20,10 @@ class Webhook():
         self.WEBHOOK_URL = 'hoo'
         self.ROOT_URL = 'bar'
 
-    def set_parameter(self, webhook_url, root_url):
+    def set_parameter(self, webhook_url, root_url, username='hoge'):
         self.WEBHOOK_URL = webhook_url
         self.ROOT_URL = root_url
+        self.USERNAME = username
 
     def gen_msg_listpages(self, content):
         title = content.title
@@ -86,7 +87,8 @@ class Webhook():
         created_by = content['author']
         created_at = content['created_at']
 
-        msg_ = {"embeds": [{"title": f"{title}",
+        msg_ = {"username": self.USERNAME,
+                "embeds": [{"title": f"{title}",
                             "url": f"{url}",
                             "fields": [{"name": "作成者",
                                         "value": f"{created_by}",

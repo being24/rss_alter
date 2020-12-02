@@ -130,10 +130,12 @@ class NewThreads():
 
             url = vals["url"]
             categoryid = vals["categoryid"]
+            username = vals["username"]
 
             self.hook.set_parameter(
                 webhook_url=webhook_url,
-                root_url=url)
+                root_url=url,
+                username=username)
 
             result = self.rss.getnewpostspercategory(
                 url=url, categoryid=categoryid)
