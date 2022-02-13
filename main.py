@@ -38,12 +38,12 @@ class NewPagesAndCriticismIn():
         return sql_statement
 
     def get_listpages_and_send_webhook(self):
-        for key, vals in self.listpages_dict.items():
+        for key, val in self.listpages_dict.items():
 
-            target_url = vals["target_url"]
-            webhook_url = vals["webhook_url"]
-            param_dict = vals["params"]
-            root_url = vals["root_url"]
+            target_url = val["target_url"]
+            webhook_url = val["webhook_url"]
+            param_dict = val["params"]
+            root_url = val["root_url"]
 
             merge_sql = self.merge_sql(key)
 
@@ -61,7 +61,7 @@ class NewPagesAndCriticismIn():
                     not_notified_list.append(page)
 
             if key == 'criticism_in':
-                webhook_url = vals["age_url"]
+                webhook_url = val["age_url"]
                 self.hook.set_parameter(
                     webhook_url=webhook_url,
                     root_url=root_url)
@@ -76,7 +76,7 @@ class NewPagesAndCriticismIn():
 
                     self.db.execute(merge_sql, not_notified)
 
-            webhook_url = vals["webhook_url"]
+            webhook_url = val["webhook_url"]
 
             self.hook.set_parameter(
                 webhook_url=webhook_url,
