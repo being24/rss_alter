@@ -6,8 +6,6 @@ import difflib
 import itertools
 import re
 
-from sqlite_util import SQlite
-
 
 class AgeFlyer():
     def __init__(self) -> None:
@@ -20,19 +18,17 @@ class AgeFlyer():
         clean_word2 = p.sub('', word2)
         '''
         xxx = re.compile(r'SCP-X*')
-        jp = re.compile(r'-JP')
-        code_regex = re.compile(
-            '[!"#$%&\'\\\\()*+,-./:;<=>?@[\\]^_`{|}~「」〔〕“”〈〉『』【】＆＊・（）＄＃＠。、？！｀＋￥％：　 ]')
-        draft = re.compile(r'[下書き]')
+        draft = re.compile(r'下書き')
 
+        clean_word1 = word1
+        clean_word2 = word2
         clean_word1 = xxx.sub('', word1)
         clean_word2 = xxx.sub('', word2)
-        clean_word1 = jp.sub('', clean_word1)
-        clean_word2 = jp.sub('', clean_word2)
-        clean_word1 = code_regex.sub('', clean_word1)
-        clean_word2 = code_regex.sub('', clean_word2)
         clean_word1 = draft.sub('', clean_word1)
         clean_word2 = draft.sub('', clean_word2)
+
+        clean_word1 = ''.join(char for char in clean_word1 if char.isalnum())
+        clean_word2 = ''.join(char for char in clean_word2 if char.isalnum())
 
         # unicodedata.normalize() で全角英数字や半角カタカナなどを正規化する
         normalized_str1 = unicodedata.normalize(
@@ -59,17 +55,6 @@ class AgeFlyer():
 
 if __name__ == "__main__":
     age = AgeFlyer()
-    db = SQlite()
-
-    table_name = 'criticism_in'
-    created_by = 'thor_taisho'
-    same_author_sql = f'SELECT * FROM "{table_name}" WHERE created_by="{created_by}"'
-    title = 'SCP-5552: Our Stolen Theory - 奪われし理論 (1)'
-
-    result = db.get(same_author_sql)
-    # for i in result:
-    #     age.fly(title, i.title)
-
     titles = [
         'SCP-XXX-JP - 三夏への手向け(下書き)',
         'SCP-XXX-JP - あの橋を目指せ(下書き)',
@@ -94,4 +79,4 @@ if __name__ == "__main__":
                'カマキリの卵',
                'SCP-XXX-JP',
                'SCP-XXX-JP 改訂版', ]
-    age.fly_list(titles)
+    age.fly_list(titles2)
