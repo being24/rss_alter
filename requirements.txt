@@ -1,4 +1,4 @@
-﻿beautifulsoup4==4.11.1
+﻿beautifulsoup4==4.11.2
 feedparser==6.0.10
 pytz==2022.1
 requests==2.27.1
