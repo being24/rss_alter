@@ -86,7 +86,7 @@ class CriticismIn:
                 tags="_criticism-in",
                 order="created_at desc",
                 limit=100,
-                created_at="last 24 hours",
+                created_at="last 12 hours",
             )
 
             not_exist_pages = []
