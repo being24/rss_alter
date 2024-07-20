@@ -1,6 +1,6 @@
 services:
   rss:
-    image: "ghcr.io/being24/RSS_alter:latest"
+    image: "ghcr.io/being24/rss-alter:latest"
     volumes:
       - ./data:/opt/rss/data
     env_file:
