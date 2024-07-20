@@ -26,7 +26,7 @@ class MostRecentlyCreated:
         self.webhook_url = os.getenv("CRITICISM_IN")
         assert self.webhook_url is not None
 
-        self.age_webhook_url = os.getenv("TEST")
+        self.age_webhook_url = os.getenv("AGE")
         assert self.age_webhook_url is not None
 
     def get_created_datetime(self) -> datetime:
