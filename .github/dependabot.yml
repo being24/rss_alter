@@ -4,6 +4,6 @@ updates:
   directory: "/"
   schedule:
     interval: daily
-  target-branch: "master"
+  target-branch: "develop"
   open-pull-requests-limit: 10
   versioning-strategy: lockfile-only
