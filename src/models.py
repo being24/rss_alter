@@ -40,3 +40,4 @@ class Feed(BaseModel):
     wikidot_author_name: str
     wikidot_author_id: int
     type: str = "feed"
+    display_name: str = "新着スレッド"
