@@ -109,6 +109,7 @@ class Webhook:
         author = feed.wikidot_author_name
 
         msg = {
+            "username": feed.display_name,
             "embeds": [
                 {
                     "title": title,
@@ -118,7 +119,7 @@ class Webhook:
                         {"name": "公開日時", "value": published, "inline": True},
                     ],
                 }
-            ]
+            ],
         }
 
         return msg

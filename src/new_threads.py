@@ -21,8 +21,8 @@ class NewThreads:
 
         self.session = sessionmaker(engine)
 
-        webhook_url = os.getenv("NEW_THREAD")
-        assert webhook_url is not None
+        self.webhook_url = os.getenv("NEW_THREAD")
+        assert self.webhook_url is not None
 
         config_path = root_path / "data" / "NewThreads.json"
 
@@ -30,7 +30,7 @@ class NewThreads:
 
         self.webhook = Webhook()
         self.webhook.set_parameter(
-            webhook_url=webhook_url,
+            webhook_url=self.webhook_url,
         )
 
         with open(config_path, "r", encoding="utf-8") as f:
@@ -87,6 +87,10 @@ class NewThreads:
 
             feeds = self.get_feed(url)
             feeds = sorted(feeds, key=lambda x: x.published)
+
+            # feedsのdisplay_nameを設定
+            for feed in feeds:
+                feed.display_name = config.display_name
 
             for feed in feeds:
                 if not self.is_exist(feed.link):
