@@ -13,7 +13,7 @@ from webhook import Webhook
 from wikidot.module.page import PageCollection
 
 
-class MostRecentlyCreated:
+class CriticismIn:
     def __init__(self) -> None:
         self.session = sessionmaker(engine)
         self.webhook = Webhook()
@@ -143,5 +143,5 @@ class MostRecentlyCreated:
 
 
 if __name__ == "__main__":
-    mrc = MostRecentlyCreated()
+    mrc = CriticismIn()
     mrc.main()
