@@ -60,7 +60,7 @@ class MostRecentlyCreated:
                 category="_default",
                 order="created_at desc",
                 limit=100,
-                created_at="last 1 hours",
+                created_at="last 12 hours",
             )
 
             not_exist_pages = []
