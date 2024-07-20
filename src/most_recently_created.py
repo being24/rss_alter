@@ -75,7 +75,7 @@ class MostRecentlyCreated:
 
     def send_webhook(self, pages: PageCollection):
         for page in pages:
-            self.webhook.send(page)
+            self.webhook.rss_send(page)
 
     def insert2db(self, pages: PageCollection):
         with self.session() as session:

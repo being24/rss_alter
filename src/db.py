@@ -31,7 +31,7 @@ class Article(Base):
     url: Mapped[str] = Column(String)
     title: Mapped[str] = Column(String)
     tags: Mapped[str] = Column(String)
-    created_by = Column(String)
+    created_by: Mapped[str] = Column(String)
     created_at: Mapped[datetime] = Column(DateTime)
     updated_at: Mapped[datetime] = Column(DateTime)
     type: Mapped[str] = Column(String)

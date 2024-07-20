@@ -29,5 +29,14 @@ class ArticleInfo(BaseModel):
 class ThreadsConfig(BaseModel):
     display_name: str
     category_id: int
-    last_url: str
     type: str
+
+
+class Feed(BaseModel):
+    link: str
+    published: datetime
+    summary: str
+    title: str
+    wikidot_author_name: str
+    wikidot_author_id: int
+    type: str = "feed"

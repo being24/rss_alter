@@ -22,6 +22,8 @@ certifi==2024.7.4
     # via requests
 charset-normalizer==3.3.2
     # via requests
+feedparser==6.0.11
+    # via rss-alter
 greenlet==3.0.3
     # via sqlalchemy
 h11==0.14.0
@@ -44,6 +46,8 @@ python-dotenv==1.0.1
     # via rss-alter
 requests==2.32.3
     # via rss-alter
+sgmllib3k==1.0.0
+    # via feedparser
 sniffio==1.3.1
     # via anyio
     # via httpx

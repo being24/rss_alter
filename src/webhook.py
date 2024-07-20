@@ -2,6 +2,7 @@ import json
 import time
 
 import requests
+from models import ArticleInfo, Feed
 from wikidot.module.page import Page
 
 
@@ -21,11 +22,26 @@ class Webhook:
         avatar_url: str | None = None,
         username: str | None = None,
     ):
+        """webhookのパラメータを設定する
+
+        Args:
+            webhook_url (str): webhookのURL
+            avatar_url (str | None, optional): avatarのurl. Defaults to None.
+            username (str | None, optional): username. Defaults to None.
+        """
         self.user_name = username
         self.avatar_url = avatar_url
         self.webhook_url = webhook_url
 
-    def generate_embed(self, page: Page) -> dict:
+    def generate_article_embed(self, page: Page) -> dict:
+        """embedを生成する
+
+        Args:
+            page (Page): page object
+
+        Returns:
+            dict: embedの情報
+        """
         title = page.title
         url = page.get_url()
         created_at = f"<t:{int(page.created_at.timestamp())}:f>"
@@ -53,8 +69,7 @@ class Webhook:
 
         return msg
 
-    def send(self, page: Page):
-        content = self.generate_embed(page)
+    def send(self, content):
         while True:
             response = requests.post(
                 self.webhook_url,
@@ -74,3 +89,72 @@ class Webhook:
                     time.sleep(retry_after)
 
         time.sleep(0.5)
+
+    def rss_send(self, page: Page) -> None:
+        content = self.generate_article_embed(page)
+        self.send(content)
+
+    def generate_feed_embed(self, feed: Feed) -> dict:
+        """embedを生成する
+
+        Args:
+            feed (Feed): feed object
+
+        Returns:
+            dict: embedの情報
+        """
+        title = feed.title
+        url = feed.link
+        published = f"<t:{int(feed.published.timestamp())}:f>"
+        author = feed.wikidot_author_name
+
+        msg = {
+            "embeds": [
+                {
+                    "title": title,
+                    "url": url,
+                    "fields": [
+                        {"name": "投稿者", "value": author, "inline": True},
+                        {"name": "公開日時", "value": published, "inline": True},
+                    ],
+                }
+            ]
+        }
+
+        return msg
+
+    def feeds_send(self, feed: Feed):
+        content = self.generate_feed_embed(feed)
+        self.send(content)
+
+    def gen_msg_age(self, new: Page, database: ArticleInfo) -> dict:
+        msg = {
+            "embeds": [
+                {
+                    "title": "タイトルの類似度が高い下書きを検出しました",
+                    "color": 16711680,
+                    "author": {
+                        "name": f"{new.created_by.name}",
+                        "url": f"https://www.wikidot.com/user:info/{new.created_by.unix_name}",
+                        "icon_url": f"{new.created_by.avatar_url}",
+                    },
+                    "fields": [
+                        {
+                            "name": "新規ページタイトル",
+                            "value": f"[{new.title}]({new.get_url()})",
+                            "inline": False,
+                        },
+                        {
+                            "name": "元ページタイトル",
+                            "value": f"[{database.title}]({database.url})",
+                            "inline": False,
+                        },
+                    ],
+                }
+            ]
+        }
+        return msg
+
+    def send_age(self, new: Page, database: ArticleInfo) -> None:
+        content = self.gen_msg_age(new, database)
+        self.send(content)
