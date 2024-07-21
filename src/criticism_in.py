@@ -138,8 +138,8 @@ class CriticismIn:
     def main(self):
         unpost = self.get_unpost()
         self.send_webhook(unpost)
-        self.insert2db(unpost)
         self.age(unpost)
+        self.insert2db(unpost)
 
 
 if __name__ == "__main__":
