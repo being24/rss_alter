@@ -2,16 +2,20 @@ import difflib
 import itertools
 import re
 import unicodedata
+from typing import Optional
 
 
 class AgeFlyer:
     def __init__(self) -> None:
         pass
 
-    def preprocess(self, word: str) -> str:
+    def preprocess(self, word: str | None) -> str:
         re_jp = re.compile(r"\w{3}-.{3,5}-JP")
         re_cn = re.compile(r"\w{3}-CN-.{3,5}")
         re_en = re.compile(r"\w{3}-\w{3,5}")
+
+        if word is None:
+            return ""
 
         clean_word = word
         clean_word = re_jp.sub("", clean_word)
