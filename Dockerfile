@@ -18,7 +18,7 @@ RUN set -x && \
     cp /usr/share/zoneinfo/Asia/Tokyo /etc/localtime && \
     python3 -m pip install -U setuptools && \
     cd ${BOT_NAME} && \
-    python3 -m pip install -r requirements.lock && \
+    python3 -m pip install -r requirements.txt && \
     echo "Hello, ${BOT_NAME} ready!"
 
 
