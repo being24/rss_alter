@@ -13,6 +13,9 @@ class AgeFlyer:
         re_cn = re.compile(r"\w{3}-CN-.{3,5}")
         re_en = re.compile(r"\w{3}-\w{3,5}")
 
+        if word is None:
+            return ""
+
         clean_word = word
         clean_word = re_jp.sub("", clean_word)
         clean_word = re_cn.sub("", clean_word)
