@@ -110,6 +110,8 @@ class CriticismIn:
         with self.session() as session:
             for page in pages:
                 tags = ",".join(page.tags)
+                if page.title is None:
+                    page.title = "No title"
                 article = Article(
                     url=page.get_url(),
                     title=page.title,
