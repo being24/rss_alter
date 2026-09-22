@@ -1,13 +1,14 @@
 import json
 import os
 import pathlib
+from collections.abc import Callable
 from datetime import datetime
 
 import feedparser
 from db import Thread, engine
 from dotenv import load_dotenv
 from models import Feed, ThreadsConfig
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import sessionmaker
 
 from webhook import Webhook
@@ -46,8 +47,12 @@ class NewThreads:
             self.configs.append(info)
 
     def is_exist(self, url: str) -> bool:
+        normalized_url = url.replace("https://", "http://", 1)
+
         with self.session() as session:
-            stmt = select(Thread).where(Thread.url == url)
+            stmt = select(Thread).where(
+                func.replace(Thread.url, "https://", "http://") == normalized_url
+            )
             result = session.execute(stmt).fetchall()
 
         if len(result) == 0:
@@ -79,8 +84,34 @@ class NewThreads:
 
         return parsed_feed
 
-    def get_new_threads(self) -> list[Feed]:
+    @staticmethod
+    def dedupe_new_feeds(
+        configs_with_feeds: list[tuple[ThreadsConfig, list[Feed]]],
+        is_exist: Callable[[str], bool],
+    ) -> list[Feed]:
+        """同一スレッドが複数カテゴリのフィードに掲載されている場合に備え、
+        1回の実行内で既に採用したURLを追跡して二重登録を防ぐ。
+
+        is_exist(DB問い合わせ)だけでは、insert2dbが全config処理後に
+        まとめて実行されるため実行内の重複を検出できない
+        """
         not_exist_feeds = []
+        seen_urls: set[str] = set()
+
+        for config, feeds in configs_with_feeds:
+            for feed in feeds:
+                normalized_link = feed.link.replace("https://", "http://", 1)
+                if normalized_link in seen_urls:
+                    continue
+                if not is_exist(feed.link):
+                    feed.type = config.type
+                    not_exist_feeds.append(feed)
+                    seen_urls.add(normalized_link)
+
+        return not_exist_feeds
+
+    def get_new_threads(self) -> list[Feed]:
+        configs_with_feeds = []
 
         for config in self.configs:
             url = f"http://scp-jp.wikidot.com/feed/forum/ct-{config.category_id}.xml"
@@ -92,12 +123,9 @@ class NewThreads:
             for feed in feeds:
                 feed.display_name = config.display_name
 
-            for feed in feeds:
-                if not self.is_exist(feed.link):
-                    feed.type = config.type
-                    not_exist_feeds.append(feed)
+            configs_with_feeds.append((config, feeds))
 
-        return not_exist_feeds
+        return self.dedupe_new_feeds(configs_with_feeds, self.is_exist)
 
     def send_webhook(self, feeds: list[Feed]):
         for feed in feeds:

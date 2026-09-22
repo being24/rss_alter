@@ -7,7 +7,7 @@ from age_flyer import AgeFlyer
 from db import Article, engine
 from dotenv import load_dotenv
 from models import ArticleInfo, convert_datetime
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import sessionmaker
 from webhook import Webhook
 from wikidot.module.page import PageCollection
@@ -44,11 +44,13 @@ class CriticismIn:
         return criticism_in_created.created_at
 
     def is_exist(self, url: str) -> bool:
+        normalized_url = url.replace("https://", "http://", 1)
+
         with self.session() as session:
             stmt = (
                 select(Article)
                 .where(Article.type == "criticism_in")
-                .where(Article.url == url)
+                .where(func.replace(Article.url, "https://", "http://") == normalized_url)
             )
             result = session.execute(stmt).scalar_one_or_none()
 

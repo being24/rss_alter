@@ -1,4 +1,4 @@
-FROM python:3.12-alpine
+FROM python:3.12-slim
 
 WORKDIR /opt/
 
@@ -11,15 +11,17 @@ ENV PYTHONUNBUFFERED=1
 
 ARG BOT_NAME="rss"
 
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 COPY ./ ${BOT_NAME}
 
 RUN set -x && \
-    apk add --no-cache build-base nano git tzdata ncdu && \
+    apt-get update && \
+    apt-get install --no-install-recommends -y build-essential nano git tzdata ncdu && \
+    rm -rf /var/lib/apt/lists/* && \
     cp /usr/share/zoneinfo/Asia/Tokyo /etc/localtime && \
-    python3 -m pip install -U setuptools && \
     cd ${BOT_NAME} && \
-    python3 -m pip install -r requirements.txt && \
+    uv sync --locked && \
     echo "Hello, ${BOT_NAME} ready!"
 
 
-CMD ["python3","/opt/rss/src/main.py"]
+CMD ["/opt/rss/.venv/bin/python3","/opt/rss/src/main.py"]
