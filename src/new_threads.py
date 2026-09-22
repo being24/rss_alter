@@ -7,7 +7,7 @@ import feedparser
 from db import Thread, engine
 from dotenv import load_dotenv
 from models import Feed, ThreadsConfig
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import sessionmaker
 
 from webhook import Webhook
@@ -46,8 +46,12 @@ class NewThreads:
             self.configs.append(info)
 
     def is_exist(self, url: str) -> bool:
+        normalized_url = url.replace("https://", "http://", 1)
+
         with self.session() as session:
-            stmt = select(Thread).where(Thread.url == url)
+            stmt = select(Thread).where(
+                func.replace(Thread.url, "https://", "http://") == normalized_url
+            )
             result = session.execute(stmt).fetchall()
 
         if len(result) == 0:
