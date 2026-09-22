@@ -5,7 +5,7 @@ from datetime import datetime
 import wikidot
 from db import Article, engine
 from dotenv import load_dotenv
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import sessionmaker
 from webhook import Webhook
 from wikidot.module.page import PageCollection
@@ -42,11 +42,13 @@ class MostRecentlyCreated:
         return most_recently_created.created_at
 
     def is_exist(self, url: str) -> bool:
+        normalized_url = url.replace("https://", "http://", 1)
+
         with self.session() as session:
             stmt = (
                 select(Article)
                 .where(Article.type == "recently_created")
-                .where(Article.url == url)
+                .where(func.replace(Article.url, "https://", "http://") == normalized_url)
             )
             result = session.execute(stmt).scalar_one_or_none()
 
