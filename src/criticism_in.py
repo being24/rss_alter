@@ -52,7 +52,7 @@ class CriticismIn:
                 .where(Article.type == "criticism_in")
                 .where(func.replace(Article.url, "https://", "http://") == normalized_url)
             )
-            result = session.execute(stmt).scalar_one_or_none()
+            result = session.execute(stmt).first()
 
         return result is not None
 
