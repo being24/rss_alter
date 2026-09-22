@@ -76,7 +76,7 @@ class NewThreads:
                 published=published,
                 summary=entry["summary"],
                 title=entry["title"],
-                wikidot_author_name=entry["wikidot_authorname"],
+                wikidot_author_name=entry.get("wikidot_authorname") or "不明",
                 wikidot_author_id=entry["wikidot_authoruserid"],
             )
 
